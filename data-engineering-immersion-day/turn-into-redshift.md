@@ -34,4 +34,59 @@ IAM_ROLE default
 CREATE external DATABASE if not exists;
 ```
 5. `Run` to create a scheman ticketdata from Glue Data Catalog. This uses Redshift Spectrum service which queries the data from S3 + Glue data catalog, It is similar to Amazon Athena, but with dedictated resource in Redshift.
-6. 
+6. Try below query which is same as the one query from Athena in the workshop
+```
+SELECT
+e.id AS event_id,
+e.sport_type_name AS sport,
+e.start_date_time AS event_date_time,
+h.name AS home_team,
+a.name AS away_team,
+l.name AS location,
+l.city
+FROM ticketdata.parquet_sporting_event e,
+ticketdata.parquet_sport_team h,
+ticketdata.parquet_sport_team a,
+ticketdata.parquet_sport_location l
+WHERE
+e.home_team_id = h.id
+AND e.away_team_id = a.id
+AND e.location_id = l.id;
+```
+
+## 4. Copy the data from data lake to Redshift storage
+
+1. Create local database schema
+```
+Create schema local if not exists;
+```
+2. Create Table AS (CTAS) from Glue data query to local table
+```
+Create schema local if not exists;
+
+create table local.sporting_event_full AS
+SELECT
+e.id AS event_id,
+e.sport_type_name AS sport,
+e.start_date_time AS event_date_time,
+h.name AS home_team,
+a.name AS away_team,
+l.name AS location,
+l.city
+FROM ticketdata.parquet_sporting_event e,
+ticketdata.parquet_sport_team h,
+ticketdata.parquet_sport_team a,
+ticketdata.parquet_sport_location l
+WHERE
+e.home_team_id = h.id
+AND e.away_team_id = a.id
+AND e.location_id = l.id;
+```
+3. local.sporting_event_full has been created with the data.
+```
+SELECT * FROM "dev"."local"."sporting_event_full" limit 10;
+
+SELECT count(1) FROM "dev"."local"."sporting_event_full";
+```
+
+Migration completed.

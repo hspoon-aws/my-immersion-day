@@ -1,7 +1,7 @@
 # Turn Data Lake into Redshift Data warehousing
 
 This is a lab guide to turn typical data lake architecture (S3 + Glue + Athena) into Redshift.
-(The lab is an extension from AWS Data Engineering Immersion Day)
+(The lab is an extension from AWS Data Engineering Immersion Day - Data Validation and ETL https://catalog.us-east-1.prod.workshops.aws/workshops/976050cc-0606-4b23-b49f-ca7b8ac4b153/en-US/600)
 
 ## 1. Create Redshift cluster
 
@@ -14,14 +14,19 @@ This is a lab guide to turn typical data lake architecture (S3 + Glue + Athena) 
 6. check `Auto generate password` checkbox
 7. Wait 5-10 min for the Redshift cluster creation
 
-
-## 2. Query Editor
-
+## 2. Grant Glue Data Catalog permission for Redshift spectrum
 1. Select the Redshift cluster
-2. Action > Permission > Manage IAM role, then add 
-3. Click `Query Data` > `Query data in query editor v2`
-4. You will go into the web-based query editor
-5. Select the redshift cluster > dev, then input the following SQL script into the query editor
+2. Action > Permission > Manage IAM role, copy the IAM role name.
+3. Go to IAM portal in AWS console, select Role and find the IAM role from Step 2.
+4. Add Managed IAM policy `AWSGlueConsoleFullAccess` into the IAM role. (In production, please use least privilage for the IAM role)
+![image](https://user-images.githubusercontent.com/112601576/205630820-708a3db3-1b27-4363-80fc-daf4d2f02efd.png)
+
+
+## 3. Query Editor
+1. Select the Redshift cluster
+2. Click `Query Data` > `Query data in query editor v2`
+3. You will go into the web-based query editor
+4. Select the redshift cluster > dev, then input the following SQL script into the query editor
 ```
 CREATE external SCHEMA ticketdata
 FROM data catalog DATABASE 'ticketdata'
